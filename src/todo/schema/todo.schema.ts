@@ -21,6 +21,9 @@ export class Todo {
 
     @Prop()
     deletedAt?: Date;
+
+    @Prop()
+    user_id: string;
 }
 
 

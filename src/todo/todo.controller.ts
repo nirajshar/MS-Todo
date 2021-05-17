@@ -1,57 +1,91 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpService, Param, Post, Put } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Observable } from 'rxjs';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { TodoService } from './todo.service';
 
-@ApiTags('Todo')
 @Controller('todo')
 export class TodoController {
     constructor(
         private readonly todoService: TodoService,
+        private readonly httpService: HttpService
     ) { }
 
+    // ## Todo-User
 
-    @ApiOperation({ summary: 'Find all todos' })
+    @ApiTags('Todo-User')
+    @ApiOperation({ summary: 'Find all todos by user' })
     @ApiResponse({ status: 200, description: 'Return all todos' })
     @ApiResponse({ status: 404, description: 'Todo not found' })
     @Get()
-    async findAll() {
-        return await this.todoService.findAll();
+    async findAllByUser() {
+        return await this.todoService.findAllByUser();
     }
 
-    @ApiOperation({ summary: 'Get One todo' })
+    @ApiTags('Todo-User')
+    @ApiOperation({ summary: 'Get One todo by user' })
     @ApiResponse({ status: 200, description: 'Return all todos' })
     @ApiResponse({ status: 404, description: 'Todo not found' })
     @Get(':id')
-    async findOne(@Param('id') id: string) {
-        return await this.todoService.findOne(id);
+    async findOneByUser(@Param('id') id: string) {
+        return await this.todoService.findOneByUser(id);
     }
 
-    @ApiOperation({ summary: 'Create One todo' })
+    @ApiTags('Todo-User')
+    @ApiOperation({ summary: 'Create One todo for user' })
     @ApiBody({ type: CreateTodoDto })
     @ApiResponse({ status: 200, description: 'Create one todo' })
     @ApiResponse({ status: 404, description: 'Todo not created' })
     @Post()
-    async create(@Body() createTodoDto: CreateTodoDto) {
-        return await this.todoService.create(createTodoDto);
+    async createForUser(@Body() createTodoDto: CreateTodoDto) {
+        return await this.todoService.createForUser(createTodoDto);
     }
 
-    @ApiOperation({ summary: 'Update One todo' })
+    @ApiTags('Todo-User')
+    @ApiOperation({ summary: 'Update One todo of user' })
     @ApiBody({ type: UpdateTodoDto })
     @ApiResponse({ status: 200, description: 'Update one todo' })
     @ApiResponse({ status: 404, description: 'Todo not updated' })
     @Put(':id')
-    async update(@Param('id') id: string, @Body() updateTodoDto: UpdateTodoDto) {
-        return await this.todoService.update(id, updateTodoDto);
+    async updateForUser(@Param('id') id: string, @Body() updateTodoDto: UpdateTodoDto) {
+        return await this.todoService.updateForUser(id, updateTodoDto);
     }
 
-    @ApiOperation({ summary: 'Delete One todo' })
+    @ApiTags('Todo-User')
+    @ApiOperation({ summary: 'Delete One todo of user' })
     @ApiResponse({ status: 200, description: 'Delete one todo' })
     @ApiResponse({ status: 404, description: 'Todo not deleted' })
     @Delete(':id')
-    async delete(@Param('id') id: string) {
-        return await this.todoService.delete(id);
+    async deleteForUser(@Param('id') id: string) {
+        return await this.todoService.deleteForUser(id);
+    }
+
+    // ## Todo-Admin
+
+    @ApiTags('Todo-Admin')
+    @ApiOperation({ summary: 'Show all todos' })
+    @ApiResponse({ status: 200, description: 'Return all todos' })
+    @ApiResponse({ status: 404, description: 'Todo not found' })
+    @Get('admin/todo')
+    async findAllTodoByAdmin() {
+        console.log(await this._getUserDetails());
+        return await this.todoService.findAll();
+    }
+
+    @ApiTags('Todo-Admin')
+    @ApiOperation({ summary: 'Get One todo' })
+    @ApiResponse({ status: 200, description: 'Return all todos' })
+    @ApiResponse({ status: 404, description: 'Todo not found' })
+    @Get('admin/todo/:id')
+    async findOneTodoByAdmin(@Param('id') id: string) {
+        return await this.todoService.findOne(id);
+    }
+
+    // ## Get User Details 
+    private async _getUserDetails() {
+        let response = await this.httpService.get('http://localhost:4000/');
+        return response;
     }
 
 }

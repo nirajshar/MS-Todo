@@ -1,4 +1,9 @@
+import { ApiProperty } from "@nestjs/swagger"
+
 export class BaseTodoDto {
-    title: string
+    @ApiProperty()
+    title: string;
+
+    @ApiProperty()
     description?: string
 }
